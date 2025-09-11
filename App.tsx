@@ -1,20 +1,30 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// App.tsx
+import { Provider, useDispatch } from "react-redux";
+import "./global.css";
+import  { useEffect } from "react";
+import StackNavigator from "./src/navigation/Stack";
+import { store, useAppDispatch } from "./src/store";
+import { restoreLogin } from "./src/store/feature/auth/authSlice";
+import { StatusBar } from "react-native";
+
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <StatusBar/>
+      <AppInitializer />
+      <StackNavigator />
+    </Provider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+// This component runs once to restore login state from AsyncStorage
+const AppInitializer = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(restoreLogin());
+  }, [dispatch]);
+
+  return null;
+};
