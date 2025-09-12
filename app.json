@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-        "plugins": [
+    "plugins": [
       "@config-plugins/react-native-blob-util",
       "@config-plugins/react-native-pdf"
     ],
@@ -17,7 +17,10 @@
       "backgroundColor": "#7c3aed"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,7 +28,18 @@
         "backgroundColor": "#7c3aed"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.androidexpodevone.knestnesting"
+      "package": "com.androidexpodevone.knestnesting",
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -35,6 +49,9 @@
       "eas": {
         "projectId": "d73733f4-2b60-4d0d-9243-eb1635e301b3"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d73733f4-2b60-4d0d-9243-eb1635e301b3"
     }
   }
 }

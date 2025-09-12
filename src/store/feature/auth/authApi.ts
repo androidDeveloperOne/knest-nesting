@@ -10,7 +10,7 @@ const BASE_URL = 'http://172.16.3.1:8000/api/method/';
 export const loginAPI = async ({ usr, pwd }: LoginRequest) => {
   const dummyUser = {
     usr: 'testuser',
-    pwd: 'test123',
+    pwd: 'test123', 
 
   };
 

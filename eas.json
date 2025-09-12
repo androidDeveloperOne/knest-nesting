@@ -1,24 +1,27 @@
 {
   "cli": {
-    "version": ">= 5.7.0"
+    "version": ">= 3.17.1"
   },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "android": {
-        "buildType": "apk"
+      "channel": "development",
+      "env": {
+        "APP_ENV": "development"
       }
     },
     "preview": {
       "distribution": "internal",
+      "channel": "preview",
       "android": {
         "buildType": "apk"
       }
     },
     "production": {
-      "android": {
-        "buildType": "apk"
+      "channel": "production",
+      "env": {
+        "APP_ENV": "production"
       }
     }
   },
