@@ -24,18 +24,20 @@ const ActivityWrapper: React.FC<ActivityWrapperProps> = ({
   data,
 }) => {
   const renderItem = ({ item }: { item: ActivityItem }) => (
-    <View className="border-b border-gray-200 py-3">
-      <Text className="text-black font-semibold">
+    <View className="bg-[#7c3aed] my-3 rounded-md border-gray-200 py-3 px-2">
+      <Text className="text-white font-semibold my-1 text-center">
         {" "}
         {item.kind.charAt(0).toUpperCase() + item.kind.slice(1)}
       </Text>
 
-      <Text className="text-black">
+      <Text className="text-white  text-sm my-2">
         {item.unit}- {item.profile} - {item.version_no}{" "}
       </Text>
+      <View className=" flex-row justify-between">
+        <Text className="text-white text-xs"> {item.actor || "Unknown"}</Text>
 
-      <Text className="text-black"> {item.actor || "Unknown"}</Text>
-      <Text className="text-black font-semibold"> {item.ts}</Text>
+        <Text className="text-white text-xs"> {item.ts}</Text>
+      </View>
     </View>
   );
 
@@ -46,17 +48,19 @@ const ActivityWrapper: React.FC<ActivityWrapperProps> = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/50 items-center px-3">
-        <View className="w-full">
-          <View className="flex-row justify-between my-2 py-2 rounded-md bg-white px-3">
-            <Text className="text-black  font-bold">User Activities</Text>
+      <View className="flex-1 bg-black/80 items-center">
+        <View className="w-full   rounded-xl  ">
+          <View className="flex-row justify-around my-2 py-2 rounded-md ">
+            <Text className="text-white  font-bold  text-xl text-center">
+              User Activities
+            </Text>
             <TouchableOpacity onPress={onClose}>
               <Ionicons name="close-sharp" size={24} color="red" />
             </TouchableOpacity>
           </View>
 
-          <View className="px-3">
-            <View className="bg-white rounded-md p-3 ">
+          <View className="">
+            <View className="rounded-md p-3 ">
               <FlatList
                 data={data}
                 keyExtractor={(item, index) => `${item.ts}-${index}`}

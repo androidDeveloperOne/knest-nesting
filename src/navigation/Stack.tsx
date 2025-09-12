@@ -5,7 +5,7 @@ import ScreenA from "../screens/ScreenA";
 import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Login from "../screens/Login";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import Badge from "../components/Badge";
 import { useAppDispatch, useAppSelector } from "../store";
 import PdfViewer from "../components/PdfViewerScreen";
@@ -54,6 +54,7 @@ const StackNavigator: React.FC = ({}) => {
           },
 
           headerTintColor: "#ffff",
+
           headerRight: () => (
             <View className="flex-row mr-4">
               <TouchableOpacity
@@ -62,7 +63,7 @@ const StackNavigator: React.FC = ({}) => {
               >
                 <Ionicons
                   name="notifications-outline"
-                  size={24}
+                  size={21}
                   color="white"
                 />
                 <Badge count={3} />
@@ -72,8 +73,25 @@ const StackNavigator: React.FC = ({}) => {
                 onPress={() => setShowModal(true)}
                 className="mt-1"
               >
-                <AntDesign name="poweroff" size={18} color="#ffff" />
+                <AntDesign name="poweroff" size={15} color="#ffff" />
               </TouchableOpacity>
+            </View>
+          ),
+
+          headerLeft: () => (
+            <View className=" flex-row justify-around px-3">
+              <View>
+                <Text className="text-xl font-semibold  text-white">
+                  Nesting
+                </Text>
+              </View>
+
+              <View className="ps-3">
+                <TextInput
+                  className="bg-white   w-60 placeholder:text-xs   h-9  rounded-xl  "
+                  placeholder="Search IPO"
+                />
+              </View>
             </View>
           ),
         }}
@@ -82,7 +100,7 @@ const StackNavigator: React.FC = ({}) => {
           <Stack.Screen
             name="Dashboard"
             component={DashBoard}
-            options={{ title: "Nesting" }}
+            options={{ title: "" }}
           />
         ) : (
           <Stack.Screen
@@ -98,7 +116,15 @@ const StackNavigator: React.FC = ({}) => {
           options={{ title: "ScreenA" }}
         />
 
-        <Stack.Screen name="PdfViewer" component={PdfViewer} />
+        <Stack.Screen
+          name="PdfViewer"
+    options={{
+    title: "",
+    headerRight: () => null,
+    headerLeft: undefined, // Keeps the default back arrow
+  }}
+          component={PdfViewer}
+        />
       </Stack.Navigator>
 
       <ModalWrapper

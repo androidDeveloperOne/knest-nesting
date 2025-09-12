@@ -22,12 +22,12 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, onItemPress }) => {
               onPress={() => onItemPress?.(item, index)}
               hitSlop={8}
             >
-              <Text className="text-sm font-medium text-blue-600">
+              <Text className="text-xs font-medium text-blue-600">
                 {item}
               </Text>
             </Pressable>
             {index < items.length - 1 && (
-              <Text className="mx-2 text-sm text-gray-500">{">"}</Text>
+              <Text className="mx-2 text-xs text-gray-500">{">"}</Text>
             )}
           </View>
         ))}

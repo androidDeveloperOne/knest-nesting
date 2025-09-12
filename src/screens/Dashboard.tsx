@@ -55,6 +55,38 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
 
   const isProfileLevel = currentLevelIndex === levelOrder.length - 1;
 
+  // useEffect(() => {
+  //   dispatch(getCompanyData(selection));
+  //   // dispatch(clearProfileData());
+  // }, [dispatch]);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (currentLevelIndex === 0) return false;
+
+      const prevLevelIndex = currentLevelIndex - 1;
+      const prevLevel = levelOrder[prevLevelIndex];
+
+      const updatedSelection = {
+        ...selection,
+        level: prevLevel,
+        [levelOrder[currentLevelIndex]]: "",
+      };
+
+      setSelection(updatedSelection);
+      setCurrentLevelIndex(prevLevelIndex);
+      dispatch(getCompanyData(updatedSelection));
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [currentLevelIndex, selection, dispatch]);
+
   const getItemsFromDummyData = () => {
     if (currentLevelIndex === 0) {
       // Show company node itself as the only item at root (Home)
@@ -106,38 +138,6 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const currentItems = getItemsFromDummyData();
 
   console.log("currentItem", currentItems);
-
-  // useEffect(() => {
-  //   dispatch(getCompanyData(selection));
-  //   // dispatch(clearProfileData());
-  // }, [dispatch]);
-
-  useEffect(() => {
-    const backAction = () => {
-      if (currentLevelIndex === 0) return false;
-
-      const prevLevelIndex = currentLevelIndex - 1;
-      const prevLevel = levelOrder[prevLevelIndex];
-
-      const updatedSelection = {
-        ...selection,
-        level: prevLevel,
-        [levelOrder[currentLevelIndex]]: "",
-      };
-
-      setSelection(updatedSelection);
-      setCurrentLevelIndex(prevLevelIndex);
-      dispatch(getCompanyData(updatedSelection));
-      return true;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-
-    return () => backHandler.remove();
-  }, [currentLevelIndex, selection, dispatch]);
 
   // const handleBreadcrumbPress = (label: string, index: number) => {
   //   dispatch(clearProfileData());
@@ -282,21 +282,30 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
     if (nextLevel) setCurrentLevelIndex(currentLevelIndex + 1);
   };
 
-  return (
-    <View className="flex-1 bg-gray-100">
-      {/* {loading && <Text className="text-center py-4">Loading...</Text>} */}
+  const levelColorMap: Record<number, string[]> = {
+    0: ["bg-gray-100", "bg-gray-200"],
+    1: ["bg-blue-100", "bg-blue-200"],
+    2: ["bg-green-100", "bg-green-200"],
+    3: ["bg-purple-100", "bg-purple-200"],
+    4: ["bg-pink-100", "bg-pink-200"],
+  };
 
-      <Breadcrumb
-        items={[
-          "Home",
-          selection.company,
-          selection.year,
-          selection.ipo,
-          selection.unit,
-          selection.profile,
-        ].filter(Boolean)}
-        onItemPress={handleBreadcrumbPress}
-      />
+  return (
+    <View className="flex-1   ">
+      {/* {loading && <Text className="text-center py-4">Loading...</Text>} */}
+      <View className="px-2 my-2">
+        <Breadcrumb
+          items={[
+            "Home",
+            selection.company,
+            selection.year,
+            selection.ipo,
+            selection.unit,
+            selection.profile,
+          ].filter(Boolean)}
+          onItemPress={handleBreadcrumbPress}
+        />
+      </View>
 
       <FlatList
         key={"2-columns"}
@@ -308,8 +317,12 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
           `${item.name || item.ipo_no || item.child_name || index}`
         }
         numColumns={2}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const isPdf = item?.file_url ? true : false;
+          const colorsForLevel = levelColorMap[currentLevelIndex] || [
+            "bg-gray-100",
+          ];
+          const bgColor = colorsForLevel[index % colorsForLevel.length];
           return (
             <View style={{ flex: 1, margin: 8 }}>
               <FileCard
@@ -318,6 +331,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
                 onDownload={() => {}}
                 showFolderIcon={!isPdf}
                 showFileIcon={isPdf}
+                bgColor={bgColor}
               />
             </View>
           );

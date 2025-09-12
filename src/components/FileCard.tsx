@@ -24,6 +24,7 @@ interface FileCardProps {
   onDownload?: () => void;
   showFolderIcon: boolean;
   showFileIcon: boolean;
+  bgColor:string
 }
 
 const FileCard: React.FC<FileCardProps> = ({
@@ -32,6 +33,7 @@ const FileCard: React.FC<FileCardProps> = ({
   onDownload,
   showFileIcon,
   showFolderIcon,
+  bgColor
 }) => {
   const getFilename = (url?: string): string => {
     if (!url) return "Unnamed";
@@ -44,7 +46,7 @@ const FileCard: React.FC<FileCardProps> = ({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className="bg-white rounded-xl p-2 m-2 shadow-md"
+  className={`${bgColor} rounded-xl p-2 m-2 shadow-md`}
     >
       <View className="flex-row justify-between items-center">
         <View>
