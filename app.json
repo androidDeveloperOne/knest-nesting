@@ -4,7 +4,7 @@
     "slug": "knest-nesting",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/knest_logo.png",
     "userInterfaceStyle": "light",
     "plugins": [
       "@config-plugins/react-native-blob-util",
@@ -14,7 +14,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#7c3aed"
+      "backgroundColor": "#0a2351"
     },
     "ios": {
       "supportsTablet": true,
@@ -24,8 +24,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#7c3aed"
+        "foregroundImage": "./assets/knest_logo.png",
+        "backgroundColor": "#0a2351"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.androidexpodevone.knestnesting",

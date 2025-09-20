@@ -19,14 +19,15 @@ const BottomTabNavigator = ({ searchText, viewType,onTabChange }: { searchText: 
     return (
         <Tab.Navigator
             screenOptions={{
+                
                 headerShown: false,
                 tabBarActiveTintColor: "#0a2351",
                 tabBarInactiveTintColor: "gray",
                 tabBarStyle: {
-                    // backgroundColor: "#0a2351",           
-                    borderTopLeftRadius: 15,              
-                    borderTopRightRadius: 15,
-                    height: 60,                       
+             
+                    // borderTopLeftRadius: 15,              
+                    // borderTopRightRadius: 15,
+                    // height: 60,                       
                 }
             }}
             screenListeners={{
@@ -60,7 +61,6 @@ const BottomTabNavigator = ({ searchText, viewType,onTabChange }: { searchText: 
                 name="Profile"
                 component={Profile}
                 options={{
-                    
                     tabBarIcon: () => (
                         <FontAwesome name="user" size={24} color="black" />
                     )

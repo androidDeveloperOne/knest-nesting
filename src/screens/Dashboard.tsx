@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { View, FlatList, Text, BackHandler, Linking } from "react-native";
 import FileCard from "../components/FileCard";
@@ -16,7 +16,6 @@ import { RootStackParamList } from "../navigation/Stack";
 import { dummyData } from "./mockData";
 import { downloadData } from "../store/feature/download/downloadSlice";
 import * as Sharing from 'expo-sharing';
-import { useFocusEffect } from "@react-navigation/native";
 const levelOrder = ["company", "year", "ipo", "unit", "profile"];
 const identifierKeyMap: Record<string, string> = {
   company: "name",
@@ -70,43 +69,12 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ searchText, navigatio
 
   console.log("selection", selection);
   const isProfileLevel = currentLevelIndex === levelOrder.length - 1;
-// Fetch data when screen gains focus, using latest searchText
-useFocusEffect(
-  useCallback(() => {
-    if (searchText.trim() === "") {
-      const resetSelection: RequestBody = {
-        level: "company",
-        company: "",
-        year: "",
-        ipo: "",
-        ipo_name: "",
-        unit: "",
-        profile: "",
-        search: "",
-        limit: 50,
-      };
-      setCurrentLevelIndex(0);
-      setSelection(resetSelection);
-      dispatch(getCompanyData(resetSelection));
-    } else {
-      const updatedSelection: RequestBody = {
-        level: "company",
-        company: "",
-        year: "",
-        ipo: "",
-        ipo_name: "",
-        unit: "",
-        profile: "",
-        search: searchText.trim(),
-        limit: 50,
-      };
-      setCurrentLevelIndex(0);
-      setSelection(updatedSelection);
-      dispatch(getCompanyData(updatedSelection));
-    }
-    dispatch(clearProfileData());
-  }, [searchText, dispatch])
-);
+
+  useEffect(() => {
+    dispatch(getCompanyData(selection));
+    // dispatch(clearProfileData());
+  }, [dispatch,selection]);
+
 
   useEffect(() => {
     if (searchText.trim() === "") return;
@@ -353,11 +321,6 @@ useFocusEffect(
           `${item.name || item.ipo_no || item.child_name || index}`
         }
         numColumns={viewType === "grid" ? 2 : 1}
-        ListEmptyComponent={() => (
-          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 20 }}>
-            <Text style={{ fontSize: 18, color: "gray" }}>No Data Found</Text>
-          </View>
-        )}
         renderItem={({ item, index }) => {
           const isPdf = item?.file_url ? true : false;
           const colorsForLevel = levelColorMap[currentLevelIndex] || [

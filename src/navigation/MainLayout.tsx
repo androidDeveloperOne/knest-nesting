@@ -1,6 +1,6 @@
 // MainLayout.tsx
 import React, { FC, useRef, useState } from "react";
-import { View, Text, TouchableOpacity, Dimensions, Animated, Easing } from "react-native";
+import { View, Text, TouchableOpacity, Dimensions, Animated, Easing,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Badge from "../components/Badge";
@@ -13,6 +13,7 @@ import ActivityWrapper from "../components/ActivityModal";
 import BottomTabNavigator from "./BottomTabNavigator";
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { SafeAreaView } from 'react-native-safe-area-context';
 const HEADER_HEIGHT = Dimensions.get("window").height * 0.09;
 const MainLayout: FC = () => {
     const dispatch = useAppDispatch();
@@ -86,15 +87,18 @@ const MainLayout: FC = () => {
 
 
     return (
-        <View style={{ flex: 1 }}
-            className=""
-        >
+<SafeAreaView style={{ flex: 1, 
+    backgroundColor: '#0a2351' 
+    
+    }} edges={['top', 'bottom']}>
+        
+        
             <View
                 style={{
                     backgroundColor: "#0a2351",
                     height: HEADER_HEIGHT,
-                borderBottomLeftRadius:10,
-                borderBottomRightRadius:10
+                // borderBottomLeftRadius:10,
+                // borderBottomRightRadius:10
                 }}
                 className="px-2 py-3">
                 <View className="flex-row items-center justify-between w-full h-full relative">
@@ -141,22 +145,23 @@ const MainLayout: FC = () => {
                     )}
                 </View>
             </View>
-
-            <View style={{ flex: 1 }}>
+            <View style={{  
+                
+       
+                
+                flex:1 }} >
                 <BottomTabNavigator searchText={searchText} viewType={viewType}
                     onTabChange={(tabName) => {
                         setActiveTab(tabName);
                         setSearchText("");
                         setIsSearchVisible(false);
-
-
                     }}
 
                 />
             </View>
 
 
-        </View>
+        </SafeAreaView>
     )
 }
 
