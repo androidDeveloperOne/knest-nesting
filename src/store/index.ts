@@ -1,10 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './feature/auth/authSlice';
 import nestingRedcer from "./feature/nestingPortal/nestingSlice"
+import activiyReducer from "./feature/activityPortal/activitySlice"
+import downloadReducer from "./feature/download/downloadSlice"
+
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    nesting:nestingRedcer
+    nesting: nestingRedcer,
+    acivity: activiyReducer,
+    downalod: downloadReducer
   },
 });
 

@@ -3,7 +3,7 @@ import { ProfileRequestBody, RequestBody } from "./nestingTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const BASE_URL =
-  "http://172.16.3.1:8000/api/method/custom_app.custom_app.page.nesting.nesting_portal.list_tree";
+  "https://erp.knestaluform.in/api/method/knest_custom_app.knest_aluform.apis.nesting_portal.list_tree";
 
 export const getCompanyDataAPI = async (data: RequestBody) => {
   try {
@@ -13,7 +13,7 @@ export const getCompanyDataAPI = async (data: RequestBody) => {
     }
     const { usr, pwd } = JSON.parse(saved);
 
-
+    console.log("dataatCompy", data)
     const response = await axios.post(
       BASE_URL,
       data, // JSON body containing your request data
@@ -44,10 +44,10 @@ export const getCompanyDataAPI = async (data: RequestBody) => {
 
 
 const PROFILE_FILES_URL =
-  "http://172.16.3.1:8000/api/method/custom_app.custom_app.page.nesting.nesting_portal.list_profile_files";
+  "https://erp.knestaluform.in/api/method/knest_custom_app.knest_aluform.apis.nesting_portal.list_profile_files";
 
 
-  export const getProfileFilesAPI = async (data: ProfileRequestBody) => {
+export const getProfileFilesAPI = async (data: ProfileRequestBody) => {
   try {
     // 1. Get saved credentials from AsyncStorage
     const saved = await AsyncStorage.getItem("credentials");

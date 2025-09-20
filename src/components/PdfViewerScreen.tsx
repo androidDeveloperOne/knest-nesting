@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, ActivityIndicator, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, ActivityIndicator, StyleSheet, Dimensions, TouchableOpacity, Text, BackHandler } from 'react-native';
 import Pdf from 'react-native-pdf';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Stack';
 
 type PdfViewerRouteProp = RouteProp<RootStackParamList, 'PdfViewer'>;
@@ -11,10 +11,25 @@ interface Props {
 }
 
 const PdfViewer: React.FC<Props> = ({ route }) => {
+  const navigation = useNavigation();
   const { fileUrl } = route.params;
+  useEffect(() => {
+    const backAction = () => {
+      navigation.goBack();
+      return true; // prevent default behavior (exit app)
+    };
 
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
+  console.log("fileUrl",fileUrl)
   return (
     <View style={styles.container}>
+         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+        <Text style={styles.closeText}>Close</Text>
+      </TouchableOpacity>
       <Pdf
         source={{ uri: fileUrl, cache: true }}
         trustAllCerts={false}
@@ -41,5 +56,19 @@ const styles = StyleSheet.create({
     flex: 1,
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 20, // adjust for your UI
+    right: 20,
+    zIndex: 10,
+    backgroundColor: 'rgba(255,0,0,0.2)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  closeText: {
+    color: 'red',
+    fontSize: 14,
   },
 });

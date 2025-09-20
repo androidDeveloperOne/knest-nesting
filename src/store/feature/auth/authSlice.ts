@@ -12,6 +12,7 @@ interface AuthState {
   isAuthenticated: boolean;
   credentials: { usr: string; pwd: string } | null;
   isRestoring: boolean;
+  data:any
 }
 
 const initialState: AuthState = {
@@ -19,6 +20,7 @@ const initialState: AuthState = {
   error: null,
   isAuthenticated: false,
   credentials: null,
+  data:null,
   isRestoring: true,
 };
 
@@ -28,7 +30,8 @@ export const login = createAsyncThunk(
     try {
       const response = await loginAPI(credentials);
       await AsyncStorage.setItem("credentials", JSON.stringify(credentials));
-      // console.log("response",response)
+      await AsyncStorage.setItem("user", JSON.stringify(response));
+      console.log("responselogin",response)
       return response; // response can be any type
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -69,9 +72,12 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(login.fulfilled, (state, action) => {
+
+
         state.loading = false;
         state.isAuthenticated = true;
-        state.credentials = action.payload;
+        state.credentials = action.meta.arg;
+        state.data = action.payload; 
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;

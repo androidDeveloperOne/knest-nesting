@@ -3,6 +3,7 @@ export interface RequestBody {
   company: string;
   year: string;
   ipo: string;
+  ipo_name:string;
   unit: string;
   profile: string;
   search: string;

@@ -34,16 +34,17 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
             <View className="flex-row   justify-between p-2  ">
               <TouchableOpacity
                 onPress={onPressOk}
-                className="mt-4 bg-gray-200 px-4 py-2 rounded"
+                className="mt-4 bg-green-600 px-4 py-2 rounded-xl"
               >
-                <Text className="text-gray-800 font-semibold">Ok</Text>
+                <Text className="text-white font-semibold">Ok</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={onClose}
-                className="mt-4 bg-gray-200 px-4 py-2 rounded"
+                className="mt-4 bg-red-600 px-4 py-2 rounded-xl"
               >
-                <Text className="text-gray-800 font-semibold">Close</Text>
+                <Text className="text-white
+                 font-semibold">Close</Text>
               </TouchableOpacity>
             </View>
           </View>
