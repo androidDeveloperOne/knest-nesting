@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet, Dimensions, TouchableOpacity, Text, BackHandler } from 'react-native';
 import Pdf from 'react-native-pdf';
 import { RouteProp, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import FullScreenLoader from './FullScreenLoader';
 
 type PdfViewerRouteProp = RouteProp<RootStackParamList, 'PdfViewer'>;
 
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const PdfViewer: React.FC<Props> = ({ route }) => {
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const { fileUrl } = route.params;
   useFocusEffect(
@@ -27,6 +29,13 @@ const PdfViewer: React.FC<Props> = ({ route }) => {
     }, [navigation])
   );
   
+  useEffect(() => {
+    const fallback = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+
+    return () => clearTimeout(fallback);
+  }, []);
 
   console.log("fileUrl",fileUrl)
   return (
@@ -40,14 +49,24 @@ const PdfViewer: React.FC<Props> = ({ route }) => {
         trustAllCerts={false}
         style={styles.pdf}
         onLoadComplete={(pages) => {
-          console.log(`Total pages: ${pages}`);
+
+          setLoading(false); 
+        }}
+        onLoadProgress={(percent) => {
+          console.log(`Loading progress: ${percent}`);
+          // You could use percent to create a progress bar or hide loader after 90%
+          if (percent >= 0.9) setLoading(false);
         }}
         onError={(error) => {
           console.log( "pdferror",  error);
+          setLoading(false)
         }}
         // activityIndicator={<ActivityIndicator size="large" color="#4f46e5" />}
       />
     </View>
+
+    <FullScreenLoader visible={loading} useGif message="Loading..." />
+
     </SafeAreaView>
     
   );

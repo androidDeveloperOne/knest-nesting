@@ -16,6 +16,7 @@ import { RootStackParamList } from "../navigation/Stack";
 import { dummyData } from "./mockData";
 import { downloadData } from "../store/feature/download/downloadSlice";
 import * as Sharing from 'expo-sharing';
+import FullScreenLoader from "../components/FullScreenLoader";
 const levelOrder = ["company", "year", "ipo", "unit", "profile"];
 const identifierKeyMap: Record<string, string> = {
   company: "name",
@@ -29,7 +30,7 @@ const openFile = async (uri: string) => {
   try {
     await Linking.openURL(uri);
   } catch (e) {
-    console.log("Failed to open file:", e);
+    // console.log("Failed to open file:", e);
   }
 };
 
@@ -46,10 +47,10 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ searchText, navigatio
     (state) => state.nesting.profileData?.message
   );
 
-  console.log("searchText", searchText)
-  console.log("comapnyData", items);
-  console.log("profileItem", profileItem);
+
   const loading = useAppSelector((state) => state.nesting.loading);
+
+
 
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
 
@@ -67,13 +68,18 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ searchText, navigatio
   });
 
 
-  console.log("selection", selection);
+
+  console.log("selection", selection)
+
   const isProfileLevel = currentLevelIndex === levelOrder.length - 1;
 
   useEffect(() => {
     dispatch(getCompanyData(selection));
+
+
+
     // dispatch(clearProfileData());
-  }, [dispatch,selection]);
+  }, []);
 
 
   useEffect(() => {
@@ -150,53 +156,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ searchText, navigatio
     return () => backHandler.remove();
   }, [currentLevelIndex, selection, dispatch]);
 
-
-  const handleBreadcrumbPress = (label: string, index: number) => {
-    dispatch(clearProfileData());
-
-    if (index === 0) {
-      // User clicked "Home"
-      const resetSelection: RequestBody = {
-        level: "company",
-        company: "",
-        year: "",
-        ipo: "",
-        ipo_name: "",
-        unit: "",
-        profile: "",
-        search: "",
-        limit: 50,
-      };
-
-
-      console.log("resetSelection", resetSelection)
-      setCurrentLevelIndex(0);
-      setSelection(resetSelection);
-      dispatch(getCompanyData(resetSelection));
-      return;
-    }
-
-    // Step 1: Determine which level was clicked
-    const clickedLevelIndex = index - 1; // Because 'Home' is static at index 0
-    const clickedLevel = levelOrder[clickedLevelIndex];
-
-    // Step 2: Create new selection with only values up to clicked level
-    const updatedSelection: RequestBody = {
-      level: clickedLevel,
-      company: clickedLevelIndex >= 0 ? selection.company : "",
-      year: clickedLevelIndex >= 1 ? selection.year : "",
-      ipo: clickedLevelIndex >= 2 ? selection.ipo : "",
-      ipo_name: clickedLevelIndex >= 2 ? selection.ipo_name : "",
-      unit: clickedLevelIndex >= 3 ? selection.unit : "",
-      profile: "",
-      search: "",
-      limit: 50,
-    };
-
-    setCurrentLevelIndex(clickedLevelIndex);
-    setSelection(updatedSelection);
-    dispatch(getCompanyData(updatedSelection));
-  };
+  
+  
 
 
   const handleDownload = async (item: any) => {
@@ -225,52 +186,178 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ searchText, navigatio
   const handleFileCardPress = async (item: any) => {
     const currentLevel = levelOrder[currentLevelIndex];
     const nextLevel = levelOrder[currentLevelIndex + 1];
-
     const identifierKey = identifierKeyMap[currentLevel];
     const itemValue = item?.[identifierKey];
-
-
-
-    // ✅ Check if it's a PDF at profile level
+  
+    console.log("itemValue", itemValue);
+  
+    // ✅ Open PDF if on profile level
     if (isProfileLevel && item?.file_url?.toLowerCase().endsWith('.pdf')) {
-      const fullUrl = `https://erp.knestaluform.in${item.file_url}`; // ✅ Fix is here
-      ;
-
+      const fullUrl = `https://erp.knestaluform.in${item.file_url}`;
       navigation.navigate('PdfViewer', { fileUrl: fullUrl });
       return;
     }
-
-    // 🔁 Continue normal nesting selection
+  
+    // ✅ If current level is 'profile'
     if (currentLevel === "profile") {
       const profileBody = {
         ipo: selection.ipo,
         unit: selection.unit,
         profile: itemValue,
       };
+  
       setSelection(prev => ({
         ...prev,
         profile: itemValue,
       }));
+  
       dispatch(getProfileData(profileBody));
       return;
     }
-
-
+  
+    // ✅ For levels before 'profile'
     const updatedSelection: RequestBody = {
       ...selection,
       [currentLevel]: itemValue,
       level: nextLevel || "profile",
-      ipo_name:
-        currentLevel === "ipo" ? item?.ipo_name || itemValue : selection.ipo_name,
+      ipo_name: currentLevel === "ipo" ? item?.ipo_name || itemValue : selection.ipo_name,
+      profile: nextLevel === "profile" ? "" : "", // <-- reset or defer profile
     };
-
-
-
+  
+    console.log("updatedSelection", updatedSelection);
+  
     setSelection(updatedSelection);
     if (nextLevel) setCurrentLevelIndex((prev) => prev + 1);
     dispatch(getCompanyData(updatedSelection));
   };
+  
 
+
+
+
+
+
+
+
+
+
+
+  const handleBreadcrumbPress = (label: string, index: number) => {
+    dispatch(clearProfileData());
+  console.log('label', label)
+    if (index === 0) {
+      // Reset everything when clicking Home
+      const resetSelection: RequestBody = {
+        level: "company",
+        company: "",
+        year: "",
+        ipo: "",
+        ipo_name: "",
+        unit: "",
+        profile: "",
+        search: "",
+        limit: 50,
+      };
+  
+      setCurrentLevelIndex(0);
+      setSelection(resetSelection);
+      dispatch(getCompanyData(resetSelection));
+      return;
+    }
+  
+    const clickedLevelIndex = index - 1;
+    const clickedLevel = levelOrder[clickedLevelIndex];
+  console.log("clickedLevel",clickedLevel)
+    // Build updatedSelection dynamically, but inject the clicked breadcrumb label for the clicked level
+    const updatedSelection: RequestBody = {
+      level: clickedLevel,
+      company: clickedLevelIndex >= 0 ? (clickedLevel === "company" ? label : selection.company) : "",
+      year: clickedLevelIndex >= 1 ? (clickedLevel === "year" ? label : selection.year) : "",
+      ipo: clickedLevelIndex >= 2 ? (clickedLevel === "ipo" ? label : selection.ipo) : "",
+      ipo_name: clickedLevelIndex >= 2 ? selection.ipo_name : "", // keep existing ipo_name if needed
+      unit: clickedLevelIndex >= 3 ? (clickedLevel === "unit" ? label : selection.unit) : "",
+      profile: clickedLevelIndex >= 4 ? (clickedLevel === "profile" ? label : selection.profile) : "",
+      search: "",
+      limit: 50,
+    };
+  
+    // Clear levels below clicked level to avoid stale data
+    if (clickedLevelIndex < 0) updatedSelection.company = "";
+    if (clickedLevelIndex < 1) updatedSelection.year = "";
+    if (clickedLevelIndex < 2) {
+      updatedSelection.ipo = "";
+      updatedSelection.ipo_name = "";
+    }
+    if (clickedLevelIndex < 3) updatedSelection.unit = "";
+    if (clickedLevelIndex < 4) updatedSelection.profile = "";
+  
+    const nextLevelIndex = clickedLevelIndex + 1;
+    const nextLevel = levelOrder[nextLevelIndex];
+  
+
+
+    if (clickedLevel === "unit") {
+      const unitSelection: RequestBody = {
+        level: "profile",
+        company: updatedSelection.company,
+        year: updatedSelection.year,
+        ipo: updatedSelection.ipo,
+        ipo_name: updatedSelection.ipo_name,
+        unit: label,
+        profile: "",
+        search: "",
+        limit: 50,
+      };
+  
+
+      setCurrentLevelIndex(4); 
+      setSelection(unitSelection);   
+      dispatch(getCompanyData(unitSelection));
+      return;
+    }
+  
+    if (nextLevel) {
+      updatedSelection.level = nextLevel;
+  
+      setCurrentLevelIndex(nextLevelIndex);
+      setSelection(updatedSelection);
+    
+      if (nextLevel === "profile") {
+        const profileParams = {
+          ipo: updatedSelection.ipo,
+          unit: updatedSelection.unit,
+          profile: clickedLevel === "unit" ? "" : (updatedSelection.profile || ""),
+        };
+        dispatch(getProfileData(profileParams));
+        return;
+      } else {
+        dispatch(getCompanyData(updatedSelection));
+        return;
+      }
+    }
+  
+    if (clickedLevel === "profile") {
+      setCurrentLevelIndex(clickedLevelIndex);
+      setSelection(updatedSelection);
+  
+      const profileParams = {
+        ipo: updatedSelection.ipo,
+        unit: updatedSelection.unit,
+        profile: updatedSelection.profile || "",
+      };
+      dispatch(getProfileData(profileParams));
+      return;
+    }
+  
+    setCurrentLevelIndex(clickedLevelIndex);
+    setSelection(updatedSelection);
+    dispatch(getCompanyData(updatedSelection));
+  };
+  
+  
+  
+  
+    
 
 
   const levelColorMap: Record<number, string[]> = {
@@ -279,6 +366,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ searchText, navigatio
     2: ["bg-green-100", "bg-green-200"],
     3: ["bg-purple-100", "bg-purple-200"],
     4: ["bg-pink-100", "bg-pink-200"],
+    5: ["bg-yellow-100", "bg-yellow-200"],
   };
   const breadcrumbBgColors = [
     "bg-red-600", // Home
@@ -288,22 +376,26 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ searchText, navigatio
     "bg-pink-600", // Unit
     "bg-yellow-600", // Profile
   ];
+
+  const breadcrumbValues = [
+    "Home",
+    selection.company,
+    selection.year,
+    selection.ipo_name,
+    selection.unit,
+    selection.profile,
+  ];
   return (
-    <View className="flex-1 bg-white px-3">
+    <View className="flex-1    bg-white px-3">
+      <FullScreenLoader visible={loading} useGif message="Loading..." />
       {/* {loading && <Text className="text-center py-4">Loading...</Text>} */}
       <View className=" my-2">
-        <Breadcrumb
-          items={[
-            "Home",
-            selection.company,
-            selection.year,
-            selection.ipo_name,
-            selection.unit,
-            selection.profile,
-          ].filter(Boolean)}
-          onItemPress={handleBreadcrumbPress}
-          bgColor={breadcrumbBgColors}
-        />
+      <Breadcrumb
+  items={breadcrumbValues.slice(0, breadcrumbValues.findLastIndex(Boolean) + 1)}
+  onItemPress={handleBreadcrumbPress}
+  bgColor={breadcrumbBgColors}
+/>
+
       </View>
 
       <FlatList
@@ -320,6 +412,9 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ searchText, navigatio
         keyExtractor={(item, index) =>
           `${item.name || item.ipo_no || item.child_name || index}`
         }
+        ListEmptyComponent={() => (
+          <Text className="text-center text-gray-500 text-lg">No Data Found</Text>
+        )}
         numColumns={viewType === "grid" ? 2 : 1}
         renderItem={({ item, index }) => {
           const isPdf = item?.file_url ? true : false;
@@ -328,7 +423,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ searchText, navigatio
           ];
 
           const isGrid = viewType === "grid";
-          console.log("index", index)
+
           const bgColor = colorsForLevel[index % colorsForLevel.length];
           return (
             <View style={{

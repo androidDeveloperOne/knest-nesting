@@ -24,9 +24,11 @@ const initialState: CompanyDataState = {
 export const getCompanyData = createAsyncThunk(
   "company/getCompanyData",
   async (body: RequestBody, { rejectWithValue }) => {
+
+    console.log("requesbodygetCompy", body)
     try {
       const response = await getCompanyDataAPI(body);
-
+      console.log("requesbodygresponse", response)
 
       return response;
     } catch (error: any) {

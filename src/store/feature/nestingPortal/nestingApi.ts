@@ -13,7 +13,7 @@ export const getCompanyDataAPI = async (data: RequestBody) => {
     }
     const { usr, pwd } = JSON.parse(saved);
 
-    console.log("dataatCompy", data)
+
     const response = await axios.post(
       BASE_URL,
       data, // JSON body containing your request data
