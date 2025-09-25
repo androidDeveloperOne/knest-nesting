@@ -8,23 +8,23 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Profile: FC = () => {
     const [isModalVisible, setIsModalVisible] = useState(false)
     const dispatch = useAppDispatch()
-    const {  data } = useAppSelector((state) => state.auth);
+    const { data } = useAppSelector((state) => state.auth);
     const [user, setUser] = useState<any>(null);
-console.log("dataprofile",data, user)
+    console.log("dataprofile", data, user)
     const handleOpenModal = () => {
         setIsModalVisible(true)
     }
     useEffect(() => {
         const loadStoredUser = async () => {
-          const jsonValue = await AsyncStorage.getItem("user");
-          const storedUser = jsonValue ? JSON.parse(jsonValue) : null;
-          console.log("storedUser:", storedUser);
-          setUser(storedUser)
+            const jsonValue = await AsyncStorage.getItem("user");
+            const storedUser = jsonValue ? JSON.parse(jsonValue) : null;
+            console.log("storedUser:", storedUser);
+            setUser(storedUser)
         };
-      
+
         loadStoredUser();
-      }, []);
-      
+    }, []);
+
     const handleLogout = () => {
         dispatch(logout())
         setIsModalVisible(false);
@@ -52,7 +52,7 @@ console.log("dataprofile",data, user)
                     <TouchableOpacity
                         onPress={handleOpenModal}
 
-                        className="bg-[#0a2351] rounded-md py-2 "
+                        className="bg-[#2563EB] rounded-md py-2 "
                     >
                         <Text className="text-center font-semibold text-white" >
 

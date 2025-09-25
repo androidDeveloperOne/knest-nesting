@@ -43,13 +43,11 @@ const Login: React.FC<LoginScreenProps> = ({ navigation }) => {
   };
 
   return (
-    // <LinearGradient
-    //   colors={["#0a2351", "#4f46e5"]}
-    //   start={{ x: 0, y: 0 }}
-    //   end={{ x: 1, y: 0 }}
-    //   style={{ flex: 1 }}
-    // >
-      <View className="flex-1  bg-[#0a2351] justify-center px-4 space-y-4">
+    <LinearGradient
+    colors={['#1E3A8A', '#2563EB']}
+    style={{ flex: 1 }}
+    >
+      <View className="flex-1   justify-center px-4 space-y-4">
         <View className="flex justify-center items-center mb-12">
           <Image
             source={require("../../assets/knest_logo.png")}

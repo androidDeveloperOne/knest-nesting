@@ -42,10 +42,7 @@ const StackNavigator: React.FC = () => {
 
   return (
     <SafeAreaProvider style={{flex:1}} >
-      <NavigationContainer
-
-
-      >
+      <NavigationContainer >
         <Stack.Navigator
           screenOptions={{ headerShown: false }}
           detachInactiveScreens={false}

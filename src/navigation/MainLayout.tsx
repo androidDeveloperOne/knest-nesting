@@ -1,38 +1,57 @@
-// MainLayout.tsx
+// layouts/MainLayout.tsx
 import React, { FC, useRef, useState } from "react";
-import { View, Text, TouchableOpacity, Dimensions, Animated, Easing,} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import Badge from "../components/Badge";
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    Dimensions,
+    Animated,
+    Easing,
+    ScrollView,
+} from "react-native";
+import Feather from "@expo/vector-icons/Feather";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import GlobalSearchBar from "../components/GlobalSearchBar";
-import { logout } from "../store/feature/auth/authSlice";
-import { useAppDispatch } from "../store";
-import { activityData } from "../screens/activityData";
-import ModalWrapper from "../components/ModalWrapper";
-import ActivityWrapper from "../components/ActivityModal";
-import BottomTabNavigator from "./BottomTabNavigator";
-import Feather from '@expo/vector-icons/Feather';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { SafeAreaView } from 'react-native-safe-area-context';
-const HEADER_HEIGHT = Dimensions.get("window").height * 0.09;
+
+import VerticalTabBar from "./VerticalTabBar";
+import DashboardScreen from "../screens/Dashboard";
+import Activity from "../screens/Activity";
+import Profile from "../screens/Profile";
+import { LinearGradient } from "expo-linear-gradient";
+
+export type RootStackParamList = {
+    Dashboard: undefined;
+    Profile: undefined;
+    Activity: undefined
+
+};
+
+
+
+
 const MainLayout: FC = () => {
-    const dispatch = useAppDispatch();
-    // const [showModal, setShowModal] = useState(false);
-    // const [showActivityModal, setShowActivityModal] = useState(false);
+
+
     const [searchText, setSearchText] = useState("");
     const [isSearchVisible, setIsSearchVisible] = useState(false);
     const [viewType, setViewType] = useState<"grid" | "list">("grid");
-    const [activeTab, setActiveTab] = useState("Dashboard");
+    const [activeTab, setActiveTab] = useState<"Dashboard" | "Activity" | "Profile">("Dashboard");
+    const [crumb, setCrumb] = useState<string[]>([]);
+    const [selectedCrumbIndex, setSelectedCrumbIndex] = useState<number | null>(null);
+
+    console.log("selectedCrumbIndex", selectedCrumbIndex)
+
+
+    console.log("crumb", crumb)
+
     console.log("activeTab", activeTab)
-    console.log("viewType", viewType)
-    const handleLogout = () => {
-        dispatch(logout());
-    };
     const animatedWidth = useRef(new Animated.Value(0)).current;
+
 
     const toggleSearch = () => {
         if (isSearchVisible) {
-            // Animate collapse
             Animated.timing(animatedWidth, {
                 toValue: 0,
                 duration: 300,
@@ -41,7 +60,6 @@ const MainLayout: FC = () => {
             }).start(() => setIsSearchVisible(false));
         } else {
             setIsSearchVisible(true);
-            // Animate expand
             Animated.timing(animatedWidth, {
                 toValue: 1,
                 duration: 300,
@@ -50,32 +68,25 @@ const MainLayout: FC = () => {
             }).start();
         }
     };
+
     const toggleViewType = () => {
         const newType = viewType === "grid" ? "list" : "grid";
         setViewType(newType);
-        console.log("Set view type to:", newType);
     };
 
-
-    // Interpolate width value (0 to 100%)
     const interpolatedWidth = animatedWidth.interpolate({
         inputRange: [0, 1],
-        outputRange: ["0%", "80%"], // You can adjust final width
+        outputRange: ["0%", "80%"],
     });
 
-
-    type BottomTabNavigatorProps = {
-        searchText: string;
-        viewType: "grid" | "list";
-    };
-
-
     const getTitleForTab = (tab: string) => {
+        if (tab === "Dashboard" && crumb.length > 0) {
+            return crumb[crumb.length - 1]; // show the last breadcrumb item
+        }
+
         switch (tab) {
             case "Activity":
                 return "User Activities";
-            case "Dashboard":
-                return "Nesting";
             case "Profile":
                 return "Profile";
             default:
@@ -85,37 +96,49 @@ const MainLayout: FC = () => {
 
 
 
-
     return (
-<SafeAreaView style={{ flex: 1, 
-    backgroundColor: '#0a2351' 
-    
-    }} edges={['top', 'bottom']}>
-        
-        
-            <View
-                style={{
-                    backgroundColor: "#0a2351",
-                    height: HEADER_HEIGHT,
-                // borderBottomLeftRadius:10,
-                // borderBottomRightRadius:10
-                }}
-                className="px-2 py-3">
-                <View className="flex-row items-center justify-between w-full h-full relative">
+        <View
+            style={{ flex: 1 }}
+        >
+            {/* Header */}
+            <LinearGradient
+colors={['#1E3A8A', '#2563EB']}
+    // start={{x: 0.38, y: 0.01}}
+    // end={{x: 0.62, y: 0.99}}
 
-                    {activeTab === "Dashboard" && (
-                        <TouchableOpacity onPress={toggleViewType} className="mx-2"
+style={{
+    borderBottomRightRadius:15,
+    borderBottomLeftRadius:15
+}}
+                className="px-2 py-3"
+            >
 
-                            style={{ zIndex: 10 }}
+
+
+
+                <View className="flex-row items-center  min-h-20 justify-between  relative">
+                    {activeTab === "Dashboard" ? (
+                        selectedCrumbIndex !== null && selectedCrumbIndex > 0 ? (
+                            // Show back arrow only if crumb index is > 0 (not Home)
+                            <TouchableOpacity
+                                onPress={() => setSelectedCrumbIndex(selectedCrumbIndex - 1)}
+                                className="mx-2 z-10"
+                            >
+                                <Feather name="arrow-left" size={24} color="white" />
+                            </TouchableOpacity>
+                        ) : (
+                            // If index is 0 or crumbs length <= 1, no back arrow shown
+                            <View style={{ width: 40, marginHorizontal: 8 }} />
+                        )
+                    ) : (
+                        // For non-Dashboard tabs, show back arrow to Dashboard
+                        <TouchableOpacity
+                            onPress={() => setActiveTab("Dashboard")}
+                            className="mx-2 z-10"
                         >
-                            {viewType === "grid" ? (
-                                <Feather name="grid" size={22} color="white" />
-                            ) : (
-                                <FontAwesome6 name="list-ul" size={22} color="white" />
-                            )}
+                            <Feather name="arrow-left" size={24} color="white" />
                         </TouchableOpacity>
                     )}
-
 
                     {isSearchVisible ? (
                         <Animated.View
@@ -130,10 +153,7 @@ const MainLayout: FC = () => {
                             />
                         </Animated.View>
                     ) : (
-                        <Text
-                            className="text-xl font-semibold tracking-widest text-white absolute left-0 right-0 text-center"
-
-                        >
+                        <Text className="text-md font-semibold tracking-widest text-white absolute left-0 right-0 text-center">
                             {getTitleForTab(activeTab)}
                         </Text>
                     )}
@@ -143,26 +163,97 @@ const MainLayout: FC = () => {
                             <Feather name="search" size={22} color="white" />
                         </TouchableOpacity>
                     )}
+
+
+
                 </View>
-            </View>
-            <View style={{  
-                
-       
-                
-                flex:1 }} >
-                <BottomTabNavigator searchText={searchText} viewType={viewType}
-                    onTabChange={(tabName) => {
-                        setActiveTab(tabName);
+
+                {activeTab === 'Dashboard' && (
+                    <View className="items-end">
+                        <TouchableOpacity onPress={toggleViewType} className="mx-2 z-10">
+                            {viewType === "grid" ? (
+                                <Feather name="grid" size={22} color="white" />
+                            ) : (
+                                <FontAwesome6 name="list-ul" size={22} color="white" />
+                            )}
+                        </TouchableOpacity>
+
+
+                    </View>
+                )}
+
+
+
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-2">
+                    <View className="flex-row items-center px-1">
+                        {crumb.map((item, index) => {
+                            const isActive = index === selectedCrumbIndex;
+                            const isLast = index === crumb.length - 1;
+
+                            return (
+                                <View key={index} className="flex-row items-center">
+                                    <TouchableOpacity onPress={() => setSelectedCrumbIndex(index)}>
+                                        <Text
+                                            className={`text-xs font-medium text-white  `}
+                                        >
+                                            {item}
+                                        </Text>
+                                    </TouchableOpacity>
+
+                                    {/* Only show the ">" if it's not the last item */}
+                                    {!isLast && (
+                                        <Text className="text-white mx-1">{'>'}</Text>
+                                    )}
+                                </View>
+                            );
+                        })}
+                    </View>
+                </ScrollView>
+
+
+            </LinearGradient>
+
+
+
+
+
+            {/* Main screen content */}
+            <View style={{ flex: 1 }}>
+
+                {/* Floating vertical tab bar */}
+                <VerticalTabBar
+                    activeTab={activeTab}
+                    onTabChange={(tab) => {
+                        setActiveTab(tab);
                         setSearchText("");
                         setIsSearchVisible(false);
+                        if (tab !== "Dashboard") {
+                            setCrumb([]);
+                            setSelectedCrumbIndex(null);
+                        }
                     }}
+                    screens={{
+                        Dashboard: (
+                            <DashboardScreen
+                                searchText={searchText}
+                                viewType={viewType}
+                                onBreadcrumbChange={(breadcrumbs) => {
+                                    setCrumb(breadcrumbs);
+                                    setSelectedCrumbIndex(breadcrumbs.length - 1); // Ensure latest breadcrumb is selected
+                                }}
 
+                                selectedCrumbIndex={selectedCrumbIndex} // 👈 Pass to child
+
+
+                            />
+                        ),
+                        Activity: <Activity />,
+                        Profile: <Profile />,
+                    }}
                 />
             </View>
+        </View>
+    );
+};
 
-
-        </SafeAreaView>
-    )
-}
-
-export default MainLayout
+export default MainLayout;
